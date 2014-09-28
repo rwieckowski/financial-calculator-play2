@@ -1,0 +1,28 @@
+@(payments: List[fincalc.Payment])
+
+@main("Schedule") {
+
+    <div class="panel panel-default">
+        <div class="panel-heading">Schedule</div>
+
+        <table class="table">
+            <tr>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Principal</th>
+                <th>Interest</th>
+                <th>Balance</th>
+            </tr>
+            @payments.map { p =>
+              <tr>
+                  <th>@p.date</th>
+                  <th>@p.amount</th>
+                  <th>@p.principal</th>
+                  <th>@p.interest</th>
+                  <th>@p.balance</th>
+              </tr>
+            }
+        </table>
+    </div>
+
+}
