@@ -1,4 +1,4 @@
-name := """fc-app"""
+name := """financial-calculator-play2"""
 
 version := "1.0-SNAPSHOT"
 
