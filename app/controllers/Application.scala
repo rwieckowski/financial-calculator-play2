@@ -20,7 +20,7 @@ object Application extends Controller {
     Ok(views.html.index("Your new application is ready."))
   }
 
-  def schedule = Action {
+  def form = Action {
     val data = Map("principal" -> "30000", "interestRate" -> "10", "start" -> LocalDate.now.toString, "nofPayments" -> "24")
     Ok(views.html.schedule(scheduleForm.bind(data), Nil))
   }
