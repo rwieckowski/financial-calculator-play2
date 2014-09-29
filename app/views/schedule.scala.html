@@ -1,28 +1,48 @@
-@(payments: List[fincalc.Payment])
+@(scheduleForm: Form[ScheduleParams], payments: List[fincalc.Payment])
+
+@import views.Bootstrap._
 
 @main("Schedule") {
-
     <div class="panel panel-default">
-        <div class="panel-heading">Schedule</div>
-
-        <table class="table">
-            <tr>
-                <th>Date</th>
-                <th>Amount</th>
-                <th>Principal</th>
-                <th>Interest</th>
-                <th>Balance</th>
-            </tr>
-            @payments.map { p =>
-              <tr>
-                  <th>@p.date</th>
-                  <th>@p.amount</th>
-                  <th>@p.principal</th>
-                  <th>@p.interest</th>
-                  <th>@p.balance</th>
-              </tr>
-            }
-        </table>
+        <div class="panel-body">
+        @helper.form(action = routes.Application.find) {
+            <div class="row">
+                @helper.inputText(scheduleForm("principal"), 'class -> "form-control", 'addon -> "$")
+                @helper.inputText(scheduleForm("interestRate"), 'class -> "form-control", 'addon -> "%")
+                @helper.inputDate(scheduleForm("start"), 'class -> "form-control")
+                @helper.inputText(scheduleForm("nofPayments"), 'class -> "form-control")
+            </div>
+                <button id="submit" type="submit" value="Find" class="btn btn-primary">Find</button>
+        }
+        </div>
     </div>
 
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Principal</th>
+                        <th>Interest</th>
+                        <th>Balance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @payments.zipWithIndex.map { case (p, i) =>
+                <tr>
+                    <td>@(i + 1)</td>
+                    <td>@p.date</td>
+                    <td>@p.amount</td>
+                    <td>@p.principal</td>
+                    <td>@p.interest</td>
+                    <td>@p.balance</td>
+                </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
 }

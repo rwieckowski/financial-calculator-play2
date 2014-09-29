@@ -1,0 +1,15 @@
+@(elements: helper.FieldElements)
+
+<div class="form-group col-sm-3">
+    <label for="@elements.id" class="control-label">@elements.label</label>
+    @if(elements.args.contains('addon)) {
+        <div class="input-group">
+            @elements.input
+            <div class="input-group-addon">@elements.args.get('addon)</div>
+        </div>
+    } else {
+        @elements.input
+    }
+</div>
+
+
