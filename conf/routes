@@ -3,8 +3,7 @@
 # ~~~~
 
 # Home page
-GET        /                     controllers.Application.index
-GET        /schedule             controllers.Application.schedule
+GET        /                     controllers.Application.schedule
 POST       /find                 controllers.Application.find
 
 # Map static resources from the /public folder to the /assets URL path
