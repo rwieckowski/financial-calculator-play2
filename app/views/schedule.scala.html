@@ -1,19 +1,33 @@
-@(scheduleForm: Form[ScheduleParams], payments: List[fincalc.Payment])
-
-@import views.Bootstrap._
+@()
 
 @main("Schedule") {
     <div class="panel panel-default">
         <div class="panel-body">
-        @helper.form(action = routes.Application.find) {
             <div class="row">
-                @helper.inputText(scheduleForm("principal"), 'class -> "form-control", 'addon -> "$")
-                @helper.inputText(scheduleForm("interestRate"), 'class -> "form-control", 'addon -> "%")
-                @helper.inputDate(scheduleForm("start"), 'class -> "form-control")
-                @helper.inputText(scheduleForm("nofPayments"), 'class -> "form-control")
+                <div class="form-group col-md-3">
+                    <label for="principal" class="control-label">Principal</label>
+                    <div class="input-group">
+                        <input id="principal" class="form-control" type="text" ng-model="params.principal"/>
+                        <div class="input-group-addon">$</div>
+                    </div>
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="interest-rate" class="control-label">Interest rate</label>
+                    <div class="input-group">
+                        <input id="interest-rate" class="form-control" type="text" ng-model="params.interestRate"/>
+                        <div class="input-group-addon">%</div>
+                    </div>
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="start" class="control-label">Start date</label>
+                    <input id="start" class="form-control" type="date" ng-model="params.start"/>
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="n-of-payments" class="control-label">Number of payments</label>
+                    <input id="n-of-payments" class="form-control" type="text" ng-model="params.nofPayments"/>
+                </div>
             </div>
-                <button id="submit" type="submit" value="Find" class="btn btn-primary">Find</button>
-        }
+            <button id="submit" type="submit" value="Find" class="btn btn-primary" ng-click="findPayments()">Find</button>
         </div>
     </div>
 
@@ -24,23 +38,21 @@
                     <tr>
                         <th>No</th>
                         <th>Date</th>
-                        <th>Amount</th>
-                        <th>Principal</th>
-                        <th>Interest</th>
-                        <th>Balance</th>
+                        <th class="text-center">Amount</th>
+                        <th class="text-center">Principal</th>
+                        <th class="text-center">Interest</th>
+                        <th class="text-center">Balance</th>
                     </tr>
                 </thead>
                 <tbody>
-                @payments.zipWithIndex.map { case (p, i) =>
-                <tr>
-                    <td>@(i + 1)</td>
-                    <td>@p.date</td>
-                    <td>@p.amount</td>
-                    <td>@p.principal</td>
-                    <td>@p.interest</td>
-                    <td>@p.balance</td>
-                </tr>
-                }
+                    <tr ng-repeat="p in payments">
+                        <td>{{ $index + 1 }}</td>
+                        <td>{{ p.date }}</td>
+                        <td class="text-right">{{ p.amount | currency: '' }}</td>
+                        <td class="text-right">{{ p.principal | currency: '' }}</td>
+                        <td class="text-right">{{ p.interest | currency: '' }}</td>
+                        <td class="text-right">{{ p.balance | currency: '' }}</td>
+                    </tr>
                 </tbody>
             </table>
         </div>

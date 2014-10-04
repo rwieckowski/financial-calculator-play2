@@ -1,11 +1,12 @@
 package controllers
 
-import org.joda.time.LocalDate
-import play.api._
-import play.api.data._
-import play.api.data.Forms._
-import play.api.mvc._
 import fincalc._
+import org.joda.time.LocalDate
+import play.api.data.Forms._
+import play.api.data._
+import play.api.libs.functional.syntax._
+import play.api.libs.json._
+import play.api.mvc._
 
 object Application extends Controller {
   val scheduleForm = Form(
@@ -17,28 +18,39 @@ object Application extends Controller {
     )(ScheduleParams.apply)(ScheduleParams.unapply))
 
   def index = Action {
-    Ok(views.html.index("Your new application is ready."))
+    Ok(views.html.schedule())
   }
 
-  def form = Action {
-    val data = Map("principal" -> "30000", "interestRate" -> "10", "start" -> LocalDate.now.toString, "nofPayments" -> "24")
-    Ok(views.html.schedule(scheduleForm.bind(data), Nil))
+  implicit object MoneyWrites extends Writes[Money] {
+    override def writes(m: Money): JsValue = Json.toJson(m.value)
   }
 
-  def find = Action { implicit request =>
-    scheduleForm.bindFromRequest.fold(
-      formWithErrors => Ok(views.html.schedule(formWithErrors, Nil)),
-      params => {
-        val ps = findSchedule(
-          Money(params.principal.toDouble),
-          params.interestRate.toDouble * 0.01,
-          params.start,
-          Payments.equal(params.nofPayments)
-        )
-        Ok(views.html.schedule(scheduleForm.fill(params), ps.get))
-      }
+  implicit val paymentWrites: Writes[Payment] = (
+    (JsPath \ "date").write[LocalDate] and
+      (JsPath \ "amount").write[Money] and
+        (JsPath \ "principal").write[Money] and
+          (JsPath \ "interest").write[Money] and
+            (JsPath \ "balance").write[Money]
+    )(unlift(Payment.unapply))
+
+  implicit val scheduleParamsReads: Reads[ScheduleParams] = (
+    (JsPath \ "principal").read[BigDecimal] and
+      (JsPath \ "interestRate").read[BigDecimal] and
+      (JsPath \ "start").read[LocalDate] and
+      (JsPath \ "nofPayments").read[Int]
+    )(ScheduleParams.apply _)
+
+  def schedule() = Action(parse.json) { request =>
+    val params = request.body.as[ScheduleParams]
+    val ps = findSchedule(
+      Money(params.principal.toDouble),
+      params.interestRate.toDouble * 0.01,
+      params.start,
+      Payments.equal(params.nofPayments)
     )
+    Ok(Json.toJson(ps.get))
   }
+
 }
 
 case class ScheduleParams(principal: BigDecimal, interestRate: BigDecimal, start: LocalDate, nofPayments: Int)
